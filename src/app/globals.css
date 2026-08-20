@@ -1,0 +1,115 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800;900&family=Syne:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 6, 6, 8;
+  --background-end-rgb: 11, 12, 16;
+}
+
+@layer base {
+  body {
+    color: rgb(var(--foreground-rgb));
+    background: #060608;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'SF Pro Display', sans-serif;
+    overflow-x: hidden;
+    selection-background-color: #D4AF37;
+    selection-color: #000000;
+  }
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+.font-syne {
+  font-family: 'Syne', sans-serif;
+}
+
+.font-jakarta {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Vertical Text Modes */
+.vertical-rl {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+.vertical-lr {
+  writing-mode: vertical-lr;
+  text-orientation: mixed;
+}
+
+/* Custom Luxury Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #060608;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #242735;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D4AF37;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: rgba(14, 16, 22, 0.72);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+}
+
+.glass-panel-champagne {
+  background: rgba(26, 22, 16, 0.75);
+  backdrop-filter: blur(28px);
+  -webkit-backdrop-filter: blur(28px);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #D4AF37;
+  outline: none;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
+}
+
+/* Apple-style Metallic Text Gradients */
+.text-metallic-silver {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 45%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-metallic-gold {
+  background: linear-gradient(135deg, #FFFDF8 0%, #F5E5C9 25%, #D4AF37 60%, #9A7B2C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-glow {
+  text-shadow: 0 0 35px rgba(255, 255, 255, 0.35);
+}
+
+.text-gold-glow {
+  text-shadow: 0 0 35px rgba(212, 175, 55, 0.45);
+}
