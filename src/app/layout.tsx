@@ -2,6 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import CustomCursor from '@/components/CustomCursor';
+import PageLoader from '@/components/PageLoader';
 import { BookingProvider } from '@/context/BookingContext';
 
 export const metadata: Metadata = {
@@ -90,8 +92,10 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="bg-graphite-950 text-white min-h-screen flex flex-col antialiased selection:bg-champagne-400 selection:text-black">
+      <body className="bg-black text-white min-h-screen flex flex-col antialiased selection:bg-white selection:text-black">
         <BookingProvider>
+          <PageLoader />
+          <CustomCursor />
           <Navbar />
           <main className="flex-1">{children}</main>
           <Footer />

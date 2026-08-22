@@ -1,56 +1,51 @@
 import React from 'react';
-import HeroScrollSequence from '@/components/home/HeroScrollSequence';
+import HeroSection from '@/components/home/HeroSection';
 import BrandStatement from '@/components/home/BrandStatement';
-import FeaturedExperience from '@/components/home/FeaturedExperience';
-import ServicesPillars from '@/components/home/ServicesPillars';
-import WhyReserve from '@/components/home/WhyReserve';
-import SurfaceLabShowcase from '@/components/home/SurfaceLabShowcase';
-import BeforeAfterSlider from '@/components/BeforeAfterSlider';
-import ReviewsSection from '@/components/home/ReviewsSection';
-import FinalCTA from '@/components/home/FinalCTA';
+import PrecisionEditorial from '@/components/home/PrecisionEditorial';
+import ThreePanelsServices from '@/components/home/ThreePanelsServices';
+import TheFinishSection from '@/components/home/TheFinishSection';
+import MolecularSection from '@/components/home/MolecularSection';
+import BeforeAfterCompare from '@/components/home/BeforeAfterCompare';
+import ProcessTimeline from '@/components/home/ProcessTimeline';
+import EditorialGallery from '@/components/home/EditorialGallery';
+import EditorialReviews from '@/components/home/EditorialReviews';
+import FinalCinematicCTA from '@/components/home/FinalCinematicCTA';
 
 export default function HomePage() {
   return (
-    <div className="flex flex-col w-full bg-graphite-950">
-      {/* 1. Hero with Apple-Style Scroll Frames & Dynamic Specular Lighting */}
-      <HeroScrollSequence />
+    <div className="flex flex-col w-full bg-black">
+      {/* 1. Hero: Centered vehicle, lower-left headline, exact entrance & scroll pull-away */}
+      <HeroSection />
 
-      {/* 2. Brand Statement: NOT JUST CLEAN. REDEFINED. */}
+      {/* 2. Brand Statement: THE RESERVE STANDARD, NOT JUST CLEAN. -> REDEFINED. */}
       <BrandStatement />
 
-      {/* 3. Featured Experience: PRECISION AT EVERY SURFACE */}
-      <FeaturedExperience />
+      {/* 3. Precision Editorial: Left 60% image, Right 40% black */}
+      <PrecisionEditorial />
 
-      {/* 4. Three Core Pillars: EXTERIOR, INTERIOR, PROTECTION */}
-      <ServicesPillars />
+      {/* 4. Service Section: Three full-height panels 33.33% */}
+      <ThreePanelsServices />
 
-      {/* 5. Why Reserve: DETAILING WITHOUT COMPROMISE & 3 Pillars */}
-      <WhyReserve />
+      {/* 5. Signature Section: THE FINISH (4-phase scroll transformation) */}
+      <TheFinishSection />
 
-      {/* 6. Signature Visual Moment: The Bespoke Surface & Ceramic Science Lab */}
-      <SurfaceLabShowcase />
+      {/* 6. Molecular / Protection: #050505, technical labels & connecting lines */}
+      <MolecularSection />
 
-      {/* 7. Interactive Before / After Paint Inspection Showcase */}
-      <section className="bg-graphite-900 py-32 px-6 md:px-12 border-t border-white/[0.06]">
-        <div className="max-w-6xl mx-auto">
-          <BeforeAfterSlider
-            beforeImage="https://images.unsplash.com/photo-1542282088-72c9c27ed0cd?auto=format&fit=crop&w=1600&q=85"
-            afterImage="https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1600&q=85"
-            beforeLabel="Uncorrected Swirls & Track Micro-Marring"
-            afterLabel="RESERVE Multi-Stage Mirror Jeweling"
-            title="Surgical Paint Leveling & Gloss Restoration"
-            vehicle="Porsche 911 GT3 RS (992) • Arctic Grey PTS"
-            beforeGloss="53.8 GU"
-            afterGloss="99.4 GU"
-          />
-        </div>
-      </section>
+      {/* 7. Before / After: Full-width 50/50 draggable comparison */}
+      <BeforeAfterCompare />
 
-      {/* 8. Reviews: 4.9 ★★★★★ & 2,900+ Reviews Horizontal Carousel */}
-      <ReviewsSection />
+      {/* 8. Process: 6-stage scroll timeline with large visual area */}
+      <ProcessTimeline />
 
-      {/* 9. Final CTA: READY FOR THE FINISH? */}
-      <FinalCTA />
+      {/* 9. Gallery: Asymmetrical 5-piece grid (2x2, 1x1, 1x2, 2x1, 1x1) */}
+      <EditorialGallery />
+
+      {/* 10. Reviews: Large editorial testimonial (4.9 ★★★★★ & 2,900+ reviews) */}
+      <EditorialReviews />
+
+      {/* 11. Final CTA: 90vh cinematic ending */}
+      <FinalCinematicCTA />
     </div>
   );
 }

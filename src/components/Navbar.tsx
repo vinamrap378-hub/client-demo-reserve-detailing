@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ArrowUpRight, Shield, Phone, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
+import { Menu, X, ArrowUpRight, ArrowRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_LINKS = [
   { name: 'Home', href: '/' },
@@ -20,16 +20,9 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001
-  });
-
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 80);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -41,88 +34,64 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Hairline Top Scroll Progress Indicator */}
-      <motion.div
-        style={{ scaleX }}
-        className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-champagne-600 via-champagne-400 to-white origin-left z-[60]"
-      />
-
       <header
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        className={`fixed top-0 left-0 right-0 z-50 h-[72px] transition-all duration-400 flex items-center ${
           scrolled
-            ? 'bg-graphite-950/85 backdrop-blur-2xl border-b border-white/[0.08] py-3.5 shadow-2xl shadow-black/80'
-            : 'bg-transparent py-6'
+            ? 'bg-[rgba(5,5,5,0.72)] backdrop-blur-[20px] border-b border-white/10'
+            : 'bg-transparent border-b border-transparent'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 md:px-12 flex items-center justify-between">
-          {/* Brand Logo */}
+        <div className="w-full max-w-7xl mx-auto px-8 flex items-center justify-between">
+          {/* Logo at Left */}
           <Link href="/" className="group flex items-center gap-3">
-            <div className="w-8 h-8 rounded-sm bg-gradient-to-br from-white via-titanium-300 to-champagne-500/80 p-[1px] shadow-lg transition-transform duration-300 group-hover:scale-105">
-              <div className="w-full h-full bg-graphite-950 flex items-center justify-center rounded-[1px]">
-                <span className="text-[13px] font-bold tracking-widest text-champagne-400">R</span>
-              </div>
-            </div>
             <div className="flex flex-col">
-              <span className="text-[17px] font-medium tracking-[0.2em] text-white uppercase group-hover:text-champagne-300 transition-colors">
+              <span className="font-cinzel text-[16px] font-semibold tracking-[0.25em] text-white uppercase group-hover:text-champagne-300 transition-colors">
                 RESERVE
               </span>
-              <span className="text-[9px] tracking-[0.3em] text-titanium-400 font-light uppercase -mt-1">
+              <span className="text-[8px] font-mono tracking-[0.35em] text-titanium-400 uppercase -mt-0.5">
                 Detailing • Miami
               </span>
             </div>
           </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8 lg:gap-10">
+          {/* Navigation Centered */}
+          <nav className="hidden lg:flex items-center gap-7">
             {NAV_LINKS.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-[13px] tracking-[0.15em] uppercase transition-all duration-300 relative py-1 ${
-                    isActive
-                      ? 'text-white font-medium'
-                      : 'text-titanium-400 hover:text-white font-normal'
-                  }`}
+                  className="group relative py-1 text-[12px] uppercase text-white/90 hover:text-white transition-colors duration-200"
+                  style={{ letterSpacing: '8px' }}
                 >
-                  {link.name}
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNavIndicator"
-                      className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-transparent via-champagne-400 to-transparent"
-                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
-                    />
-                  )}
+                  <span>{link.name}</span>
+                  {/* Underline 0 -> 100% in 250ms */}
+                  <span
+                    className={`absolute bottom-0 left-0 h-[1px] bg-white transition-all duration-250 ${
+                      isActive ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                  />
                 </Link>
               );
             })}
           </nav>
 
-          {/* Right Action CTA */}
-          <div className="hidden md:flex items-center gap-4">
-            <a
-              href="tel:+17866429018"
-              className="flex items-center gap-2 text-[12px] tracking-wider text-titanium-400 hover:text-white transition-colors px-3 py-2"
-              title="Direct Hotline"
-            >
-              <Phone className="w-3.5 h-3.5 text-champagne-400" />
-              <span>+1 (786) 642-9018</span>
-            </a>
-
+          {/* Book Now at Right */}
+          <div className="hidden sm:flex items-center gap-4">
             <Link
               href="/book"
-              className="btn-luminous-gold px-6 py-2.5 rounded-full text-[12px] font-semibold tracking-[0.18em] uppercase flex items-center justify-center gap-1"
+              className="group relative inline-flex items-center gap-2 px-[22px] py-[14px] rounded-[999px] border border-white/30 text-white text-[12px] font-medium tracking-[0.2em] uppercase bg-transparent hover:bg-white hover:text-black transition-all duration-300"
             >
               <span>Book Now</span>
-              <ArrowUpRight className="w-3.5 h-3.5 text-graphite-950" />
+              <ArrowRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-[5px]" />
             </Link>
           </div>
 
-          {/* Mobile Menu Trigger */}
+          {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-titanium-300 hover:text-white focus:outline-none"
+            className="lg:hidden p-2 text-white/80 hover:text-white"
             aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -130,7 +99,7 @@ export default function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Animated Fullscreen Drawer */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -138,50 +107,31 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-40 bg-graphite-950/95 backdrop-blur-3xl pt-24 px-8 pb-12 flex flex-col justify-between md:hidden"
+            className="fixed inset-0 z-40 bg-black/95 backdrop-blur-2xl pt-24 px-8 pb-12 flex flex-col justify-between lg:hidden"
           >
             <div className="flex flex-col gap-6">
-              <span className="text-[10px] tracking-[0.3em] uppercase text-champagne-400 font-mono">
-                // Navigation
+              <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-titanium-400">
+                // Menu
               </span>
               <div className="flex flex-col gap-5">
-                {NAV_LINKS.map((link, idx) => (
-                  <motion.div
+                {NAV_LINKS.map((link) => (
+                  <Link
                     key={link.name}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 + 0.1 }}
+                    href={link.href}
+                    className="font-cinzel text-2xl font-light tracking-[0.2em] uppercase text-white/90 hover:text-white"
                   >
-                    <Link
-                      href={link.href}
-                      className={`font-cinzel text-2xl font-light tracking-wider uppercase block ${
-                        pathname === link.href ? 'text-champagne-400 font-normal' : 'text-white/80'
-                      }`}
-                    >
-                      {link.name}
-                    </Link>
-                  </motion.div>
+                    {link.name}
+                  </Link>
                 ))}
               </div>
             </div>
 
-            <div className="flex flex-col gap-4 border-t border-white/10 pt-6">
-              <div className="flex items-center justify-between text-titanium-400 text-xs tracking-wider">
-                <span>MIAMI ATELIER</span>
-                <span className="text-champagne-400">4.9 ★★★★★</span>
-              </div>
-              <a
-                href="tel:+17866429018"
-                className="text-sm tracking-wider text-titanium-300 flex items-center gap-2"
-              >
-                <Phone className="w-4 h-4 text-champagne-400" />
-                +1 (786) 642-9018
-              </a>
+            <div className="flex flex-col gap-4 pt-6 border-t border-white/10">
               <Link
                 href="/book"
-                className="btn-luminous-gold w-full py-4 text-center text-sm font-semibold tracking-[0.2em] uppercase rounded-xl mt-2 block"
+                className="w-full py-4 text-center text-sm font-medium tracking-[0.2em] uppercase rounded-full bg-white text-black"
               >
-                Book Your Detail
+                Book Your Detail →
               </Link>
             </div>
           </motion.div>
