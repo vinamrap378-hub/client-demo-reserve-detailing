@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Sparkles, ShieldCheck, Droplets, Layers } from 'lucide-react';
@@ -40,8 +40,6 @@ const PILLARS = [
 ];
 
 export default function ServicesPillars() {
-  const [activeTab, setActiveTab] = useState(0);
-
   return (
     <section className="relative bg-graphite-950 py-32 px-6 md:px-12 overflow-hidden border-t border-white/[0.06]">
       <div className="max-w-7xl mx-auto flex flex-col gap-16">
@@ -51,18 +49,18 @@ export default function ServicesPillars() {
             <span className="text-[11px] font-mono tracking-[0.3em] uppercase text-champagne-400">
               // Core Capabilities
             </span>
-            <h2 className="text-4xl sm:text-6xl font-light tracking-tight text-white uppercase mt-2">
+            <h2 className="font-cinzel text-4xl sm:text-6xl font-light tracking-tight text-white uppercase mt-2">
               Three Pillars <br />
-              <span className="font-semibold text-metallic-silver">Of Perfection.</span>
+              <span className="font-extrabold text-metallic-gold">Of Perfection.</span>
             </h2>
           </div>
 
           <Link
             href="/services"
-            className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase font-medium text-titanium-300 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-xs tracking-[0.2em] uppercase font-medium text-titanium-300 hover:text-white transition-colors group"
           >
             <span>View Full 12-Service Catalogue</span>
-            <ArrowUpRight className="w-4 h-4 text-champagne-400" />
+            <ArrowUpRight className="w-4 h-4 text-champagne-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
           </Link>
         </div>
 
@@ -75,7 +73,7 @@ export default function ServicesPillars() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-80px' }}
               transition={{ duration: 0.6, delay: index * 0.15 }}
-              className="group relative flex flex-col justify-between h-[560px] sm:h-[620px] rounded-3xl overflow-hidden border border-white/10 hover:border-champagne-500/40 transition-all duration-500 bg-graphite-900"
+              className="group relative flex flex-col justify-between h-[560px] sm:h-[620px] rounded-3xl overflow-hidden border border-white/10 hover:border-champagne-500/50 transition-all duration-500 bg-graphite-900 shadow-2xl hover:shadow-[0_0_40px_rgba(212,175,55,0.15)]"
             >
               {/* Background Image */}
               <div className="absolute inset-0 w-full h-full">
@@ -90,17 +88,17 @@ export default function ServicesPillars() {
 
               {/* Top Card Info */}
               <div className="relative z-10 p-8 flex items-center justify-between">
-                <span className="text-xs font-mono tracking-widest text-champagne-400">
+                <span className="text-xs font-mono tracking-widest text-champagne-400 font-bold">
                   0{index + 1}
                 </span>
-                <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-[11px] font-mono text-titanium-200">
+                <span className="px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-[11px] font-mono text-champagne-300">
                   From {pillar.startingPrice}
                 </span>
               </div>
 
               {/* Bottom Card Content */}
               <div className="relative z-10 p-8 flex flex-col gap-4">
-                <h3 className="text-3xl sm:text-4xl font-extralight tracking-tight text-white uppercase group-hover:text-champagne-300 transition-colors">
+                <h3 className="font-cinzel text-3xl sm:text-4xl font-light tracking-tight text-white uppercase group-hover:text-champagne-300 transition-colors">
                   {pillar.title}
                 </h3>
                 <h4 className="text-sm font-medium text-titanium-200 -mt-2">
@@ -133,7 +131,7 @@ export default function ServicesPillars() {
 
                   <Link
                     href={`/book?cat=${pillar.id}`}
-                    className="px-4 py-2 rounded-full bg-white text-graphite-950 text-[11px] font-medium tracking-wider uppercase hover:bg-champagne-300 transition-colors"
+                    className="btn-luminous-gold px-5 py-2.5 rounded-full text-[11px] font-semibold tracking-wider uppercase"
                   >
                     Book Now
                   </Link>

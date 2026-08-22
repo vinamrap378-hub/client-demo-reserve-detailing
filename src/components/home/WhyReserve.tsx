@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ShieldCheck, Crosshair, Sparkles, Layers, ArrowUpRight, Gauge, Cpu, Check } from 'lucide-react';
@@ -41,22 +41,20 @@ const INSPECTION_LAYERS = [
 ];
 
 export default function WhyReserve() {
-  const [selectedPillar, setSelectedPillar] = useState(0);
-
   return (
     <section className="relative bg-graphite-950 py-32 px-6 md:px-12 overflow-hidden">
       {/* Ambient background glow */}
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[800px] h-[350px] bg-champagne-500/[0.03] blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[850px] h-[350px] bg-champagne-500/[0.035] blur-[150px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto flex flex-col gap-20">
+      <div className="max-w-7xl mx-auto flex flex-col gap-20 relative z-10">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto flex flex-col items-center gap-4">
-          <span className="text-[11px] font-mono tracking-[0.3em] uppercase text-champagne-400">
+          <span className="text-[11px] font-mono tracking-[0.35em] uppercase text-champagne-400">
             // The Reserve Standard
           </span>
-          <h2 className="text-4xl sm:text-6xl md:text-7xl font-extralight tracking-tight text-white uppercase">
+          <h2 className="font-cinzel text-4xl sm:text-6xl md:text-7xl font-extralight tracking-tight text-white uppercase">
             Detailing <br />
-            <span className="font-semibold text-metallic-silver">Without Compromise.</span>
+            <span className="font-extrabold text-metallic-gold">Without Compromise.</span>
           </h2>
           <p className="text-titanium-300 text-base sm:text-lg font-light">
             Founded on the principle that world-class automotive engineering deserves an equally meticulous standard of preservation.
@@ -74,7 +72,7 @@ export default function WhyReserve() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: idx * 0.15 }}
-                className="glass-panel p-8 sm:p-10 rounded-3xl border border-white/10 hover:border-champagne-400/40 transition-all flex flex-col justify-between group"
+                className="glass-panel p-8 sm:p-10 rounded-3xl border border-white/10 hover:border-champagne-400/50 transition-all flex flex-col justify-between group shadow-2xl hover:shadow-[0_0_35px_rgba(212,175,55,0.12)]"
               >
                 <div className="flex flex-col gap-6">
                   <div className="flex items-center justify-between">
@@ -87,7 +85,7 @@ export default function WhyReserve() {
                   </div>
 
                   <div>
-                    <h3 className="text-2xl font-light tracking-tight text-white uppercase">
+                    <h3 className="font-cinzel text-2xl font-light tracking-tight text-white uppercase">
                       {pillar.title}
                     </h3>
                     <p className="text-xs font-mono text-champagne-300 tracking-wider mt-1">
@@ -112,16 +110,16 @@ export default function WhyReserve() {
         </div>
 
         {/* Interactive Exploded Surface Inspection Showcase */}
-        <div className="glass-panel rounded-3xl p-8 sm:p-12 border border-white/10 relative overflow-hidden">
+        <div className="glass-panel rounded-3xl p-8 sm:p-12 border border-white/15 relative overflow-hidden shadow-2xl">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-6 flex flex-col gap-6">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-champagne-500/10 border border-champagne-500/30 text-champagne-300 text-[11px] font-mono tracking-wider w-fit">
                 <Layers className="w-3.5 h-3.5 text-champagne-400" />
                 <span>SURFACE ARCHITECTURE</span>
               </div>
-              <h3 className="text-3xl sm:text-4xl font-light text-white tracking-tight uppercase">
+              <h3 className="font-cinzel text-3xl sm:text-4xl font-light text-white tracking-tight uppercase">
                 Molecular Matrix <br />
-                <span className="font-semibold text-metallic-gold">Multi-Layer Armor.</span>
+                <span className="font-extrabold text-metallic-gold">Multi-Layer Armor.</span>
               </h3>
               <p className="text-sm text-titanium-300 font-light leading-relaxed">
                 When you invest in RESERVE detailing, your vehicle receives an engineered stack of optical perfection and protective barriers designed to resist UV oxidation, road salt, acid rain, and environmental etching.

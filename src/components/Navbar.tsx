@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, ArrowUpRight, Shield, Phone, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useScroll, useSpring } from 'framer-motion';
 
 const NAV_LINKS = [
   { name: 'Home', href: '/' },
@@ -20,6 +20,13 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  });
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -28,17 +35,22 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close mobile menu on page navigation
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [pathname]);
 
   return (
     <>
+      {/* Hairline Top Scroll Progress Indicator */}
+      <motion.div
+        style={{ scaleX }}
+        className="fixed top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-champagne-600 via-champagne-400 to-white origin-left z-[60]"
+      />
+
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'bg-graphite-950/80 backdrop-blur-2xl border-b border-white/[0.07] py-3.5 shadow-2xl shadow-black/80'
+            ? 'bg-graphite-950/85 backdrop-blur-2xl border-b border-white/[0.08] py-3.5 shadow-2xl shadow-black/80'
             : 'bg-transparent py-6'
         }`}
       >
@@ -100,10 +112,10 @@ export default function Navbar() {
 
             <Link
               href="/book"
-              className="relative inline-flex items-center justify-center px-6 py-2.5 text-[12px] font-medium tracking-[0.18em] uppercase text-graphite-950 bg-gradient-to-r from-white via-titanium-100 to-champagne-300 rounded-full hover:shadow-[0_0_25px_rgba(212,175,55,0.35)] transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              className="btn-luminous-gold px-6 py-2.5 rounded-full text-[12px] font-semibold tracking-[0.18em] uppercase flex items-center justify-center gap-1"
             >
               <span>Book Now</span>
-              <ArrowUpRight className="w-3.5 h-3.5 ml-1 text-graphite-950" />
+              <ArrowUpRight className="w-3.5 h-3.5 text-graphite-950" />
             </Link>
           </div>
 
@@ -142,7 +154,7 @@ export default function Navbar() {
                   >
                     <Link
                       href={link.href}
-                      className={`text-2xl font-light tracking-wider uppercase block ${
+                      className={`font-cinzel text-2xl font-light tracking-wider uppercase block ${
                         pathname === link.href ? 'text-champagne-400 font-normal' : 'text-white/80'
                       }`}
                     >
@@ -155,7 +167,7 @@ export default function Navbar() {
 
             <div className="flex flex-col gap-4 border-t border-white/10 pt-6">
               <div className="flex items-center justify-between text-titanium-400 text-xs tracking-wider">
-                <span>MIAMI STUDIO</span>
+                <span>MIAMI ATELIER</span>
                 <span className="text-champagne-400">4.9 ★★★★★</span>
               </div>
               <a
@@ -167,7 +179,7 @@ export default function Navbar() {
               </a>
               <Link
                 href="/book"
-                className="w-full py-4 text-center text-sm font-medium tracking-[0.2em] uppercase text-graphite-950 bg-gradient-to-r from-white to-champagne-300 rounded-xl mt-2"
+                className="btn-luminous-gold w-full py-4 text-center text-sm font-semibold tracking-[0.2em] uppercase rounded-xl mt-2 block"
               >
                 Book Your Detail
               </Link>

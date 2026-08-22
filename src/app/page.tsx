@@ -4,6 +4,7 @@ import BrandStatement from '@/components/home/BrandStatement';
 import FeaturedExperience from '@/components/home/FeaturedExperience';
 import ServicesPillars from '@/components/home/ServicesPillars';
 import WhyReserve from '@/components/home/WhyReserve';
+import SurfaceLabShowcase from '@/components/home/SurfaceLabShowcase';
 import BeforeAfterSlider from '@/components/BeforeAfterSlider';
 import ReviewsSection from '@/components/home/ReviewsSection';
 import FinalCTA from '@/components/home/FinalCTA';
@@ -11,7 +12,7 @@ import FinalCTA from '@/components/home/FinalCTA';
 export default function HomePage() {
   return (
     <div className="flex flex-col w-full bg-graphite-950">
-      {/* 1. Hero with Apple-Style Scroll Frames */}
+      {/* 1. Hero with Apple-Style Scroll Frames & Dynamic Specular Lighting */}
       <HeroScrollSequence />
 
       {/* 2. Brand Statement: NOT JUST CLEAN. REDEFINED. */}
@@ -26,7 +27,10 @@ export default function HomePage() {
       {/* 5. Why Reserve: DETAILING WITHOUT COMPROMISE & 3 Pillars */}
       <WhyReserve />
 
-      {/* 6. Interactive Before / After Paint Inspection Showcase */}
+      {/* 6. Signature Visual Moment: The Bespoke Surface & Ceramic Science Lab */}
+      <SurfaceLabShowcase />
+
+      {/* 7. Interactive Before / After Paint Inspection Showcase */}
       <section className="bg-graphite-900 py-32 px-6 md:px-12 border-t border-white/[0.06]">
         <div className="max-w-6xl mx-auto">
           <BeforeAfterSlider
@@ -42,10 +46,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* 7. Reviews: 4.9 ★★★★★ & 2,900+ Reviews Horizontal Carousel */}
+      {/* 8. Reviews: 4.9 ★★★★★ & 2,900+ Reviews Horizontal Carousel */}
       <ReviewsSection />
 
-      {/* 8. Final CTA: READY FOR THE FINISH? */}
+      {/* 9. Final CTA: READY FOR THE FINISH? */}
       <FinalCTA />
     </div>
   );

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 import { ArrowUpRight, Sparkles, Shield, Award, Gauge, Sliders, ChevronDown, CheckCircle2 } from 'lucide-react';
 
 const CARS = [
@@ -61,11 +61,19 @@ export default function HeroScrollSequence() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [activeCarIndex, setActiveCarIndex] = useState(0);
   const [imagesLoaded, setImagesLoaded] = useState(false);
+  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
+  const mouseTargetRef = useRef({ x: 0.5, y: 0.5, currentX: 0.5, currentY: 0.5 });
 
   // Scroll progression over 350vh for deep, cinematic control
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start start', 'end end']
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 24,
+    restDelta: 0.001
   });
 
   // Track active car index based on scroll position
@@ -81,17 +89,29 @@ export default function HeroScrollSequence() {
     });
   }, [scrollYProgress]);
 
+  // Track mouse movement for dynamic specular lighting on desktop
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (typeof window === 'undefined') return;
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+    mouseTargetRef.current.x = x;
+    mouseTargetRef.current.y = y;
+  }, []);
+
   // Car 1 (Porsche 911 GT3 RS) transforms: Sideways Left
-  const car1Opacity = useTransform(scrollYProgress, [0, 0.28, 0.38], [1, 1, 0]);
-  const car1X = useTransform(scrollYProgress, [0, 0.38], [0, -60]);
+  const car1Opacity = useTransform(smoothProgress, [0, 0.28, 0.38], [1, 1, 0]);
+  const car1X = useTransform(smoothProgress, [0, 0.38], [0, -70]);
+  const car1Scale = useTransform(smoothProgress, [0, 0.38], [1, 0.96]);
 
   // Car 2 (Ferrari SF90) transforms: Sideways Right
-  const car2Opacity = useTransform(scrollYProgress, [0.35, 0.45, 0.65, 0.73], [0, 1, 1, 0]);
-  const car2X = useTransform(scrollYProgress, [0.35, 0.45, 0.73], [60, 0, -60]);
+  const car2Opacity = useTransform(smoothProgress, [0.35, 0.45, 0.65, 0.74], [0, 1, 1, 0]);
+  const car2X = useTransform(smoothProgress, [0.35, 0.45, 0.74], [70, 0, -70]);
+  const car2Scale = useTransform(smoothProgress, [0.35, 0.45, 0.74], [0.96, 1, 0.96]);
 
   // Car 3 (Bespoke Atelier) transforms: Sideways Left
-  const car3Opacity = useTransform(scrollYProgress, [0.68, 0.78, 1], [0, 1, 1]);
-  const car3X = useTransform(scrollYProgress, [0.68, 0.78], [60, 0]);
+  const car3Opacity = useTransform(smoothProgress, [0.68, 0.78, 1], [0, 1, 1]);
+  const car3X = useTransform(smoothProgress, [0.68, 0.78], [70, 0]);
+  const car3Scale = useTransform(smoothProgress, [0.68, 0.78], [0.96, 1]);
 
   // Preload the 3 high-res curated vehicle images
   const loadedImagesRef = useRef<HTMLImageElement[]>([]);
@@ -121,7 +141,7 @@ export default function HeroScrollSequence() {
     });
   }, []);
 
-  // Canvas render loop for ultra-smooth 60fps blending between 3 cars
+  // Canvas render loop for ultra-smooth 60fps blending with dynamic studio specular lighting
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -131,8 +151,13 @@ export default function HeroScrollSequence() {
     let animationFrameId: number;
 
     const render = () => {
-      const progress = scrollYProgress.get();
+      const progress = smoothProgress.get();
       const images = loadedImagesRef.current;
+
+      // Smooth mouse interpolation
+      const target = mouseTargetRef.current;
+      target.currentX += (target.x - target.currentX) * 0.05;
+      target.currentY += (target.y - target.currentY) * 0.05;
 
       const dpr = window.devicePixelRatio || 1;
       const width = canvas.clientWidth;
@@ -147,15 +172,11 @@ export default function HeroScrollSequence() {
       ctx.scale(dpr, dpr);
       ctx.clearRect(0, 0, width, height);
 
-      // Black background
+      // Deep studio black background
       ctx.fillStyle = '#060608';
       ctx.fillRect(0, 0, width, height);
 
       if (images.length === 3) {
-        // Calculate blend across the 3 cars:
-        // progress 0.0 - 0.35 -> Car 0
-        // progress 0.35 - 0.70 -> Blend Car 0 into Car 1
-        // progress 0.70 - 1.0 -> Blend Car 1 into Car 2
         let imgA = images[0];
         let imgB = images[1];
         let blendFactor = 0;
@@ -167,7 +188,6 @@ export default function HeroScrollSequence() {
         } else if (progress <= 0.68) {
           imgA = images[0];
           imgB = images[1];
-          // smooth cubic easing for the blend
           const t = (progress - 0.35) / 0.33;
           blendFactor = t * t * (3 - 2 * t);
         } else {
@@ -196,14 +216,17 @@ export default function HeroScrollSequence() {
             renderX = (width - renderW) / 2;
           }
 
-          // Subtle cinematic zoom & pan
-          const scale = 1.06 + progress * 0.04;
-          const panX = renderX + panOffset * 25;
+          // Cinematic subtle zoom & interactive parallax
+          const scale = 1.05 + progress * 0.05;
+          const mouseParallaxX = (target.currentX - 0.5) * 20;
+          const mouseParallaxY = (target.currentY - 0.5) * 12;
+          const panX = renderX + panOffset * 30 + mouseParallaxX;
+          const panY = renderY + mouseParallaxY;
 
           ctx.drawImage(
             img,
             panX - ((scale - 1) * renderW) / 2,
-            renderY - ((scale - 1) * renderH) / 2,
+            panY - ((scale - 1) * renderH) / 2,
             renderW * scale,
             renderH * scale
           );
@@ -212,34 +235,48 @@ export default function HeroScrollSequence() {
         if (imgA) drawCar(imgA, 1 - blendFactor, -progress);
         if (imgB && blendFactor > 0) drawCar(imgB, blendFactor, 1 - progress);
 
-        // Apple-style editorial dark vignetting & side gradient for maximum text readability
-        // Left gradient
+        // Dynamic Interactive Specular Studio Spotlight
+        const lightX = width * target.currentX;
+        const lightY = height * target.currentY;
+        const specularGrad = ctx.createRadialGradient(
+          lightX,
+          lightY,
+          20,
+          lightX,
+          lightY,
+          width * 0.45
+        );
+        specularGrad.addColorStop(0, 'rgba(212, 175, 55, 0.09)');
+        specularGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.03)');
+        specularGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = specularGrad;
+        ctx.globalAlpha = 1;
+        ctx.fillRect(0, 0, width, height);
+
+        // Apple-style multi-stop editorial vignetting & side gradients for text contrast
         const gradLeft = ctx.createLinearGradient(0, 0, width * 0.65, 0);
-        gradLeft.addColorStop(0, 'rgba(6, 6, 8, 0.92)');
-        gradLeft.addColorStop(0.5, 'rgba(6, 6, 8, 0.6)');
+        gradLeft.addColorStop(0, 'rgba(6, 6, 8, 0.94)');
+        gradLeft.addColorStop(0.45, 'rgba(6, 6, 8, 0.65)');
         gradLeft.addColorStop(1, 'rgba(6, 6, 8, 0)');
         ctx.fillStyle = gradLeft;
-        ctx.globalAlpha = 1;
         ctx.fillRect(0, 0, width * 0.65, height);
 
-        // Right gradient
         const gradRight = ctx.createLinearGradient(width, 0, width * 0.35, 0);
-        gradRight.addColorStop(0, 'rgba(6, 6, 8, 0.92)');
-        gradRight.addColorStop(0.5, 'rgba(6, 6, 8, 0.6)');
+        gradRight.addColorStop(0, 'rgba(6, 6, 8, 0.94)');
+        gradRight.addColorStop(0.45, 'rgba(6, 6, 8, 0.65)');
         gradRight.addColorStop(1, 'rgba(6, 6, 8, 0)');
         ctx.fillStyle = gradRight;
         ctx.fillRect(width * 0.35, 0, width * 0.65, height);
 
-        // Top & Bottom gradients
         const gradTop = ctx.createLinearGradient(0, 0, 0, height * 0.35);
-        gradTop.addColorStop(0, 'rgba(6, 6, 8, 0.85)');
+        gradTop.addColorStop(0, 'rgba(6, 6, 8, 0.88)');
         gradTop.addColorStop(1, 'rgba(6, 6, 8, 0)');
         ctx.fillStyle = gradTop;
         ctx.fillRect(0, 0, width, height * 0.35);
 
         const gradBottom = ctx.createLinearGradient(0, height * 0.65, 0, height);
         gradBottom.addColorStop(0, 'rgba(6, 6, 8, 0)');
-        gradBottom.addColorStop(1, 'rgba(6, 6, 8, 0.95)');
+        gradBottom.addColorStop(1, 'rgba(6, 6, 8, 0.96)');
         ctx.fillStyle = gradBottom;
         ctx.fillRect(0, height * 0.65, width, height * 0.35);
       }
@@ -251,7 +288,7 @@ export default function HeroScrollSequence() {
     render();
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [scrollYProgress, imagesLoaded]);
+  }, [smoothProgress, imagesLoaded]);
 
   // Jump to specific car phase when clicking indicators
   const scrollToCar = (index: number) => {
@@ -265,7 +302,11 @@ export default function HeroScrollSequence() {
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[350vh] bg-graphite-950">
+    <div
+      ref={containerRef}
+      onMouseMove={handleMouseMove}
+      className="relative w-full h-[350vh] bg-graphite-950"
+    >
       {/* Sticky Fullscreen Stage */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center">
         {/* Background Canvas */}
@@ -278,38 +319,58 @@ export default function HeroScrollSequence() {
         {/* CAR 1: PORSCHE 911 GT3 RS (Left-Anchored Sideways Dramatic Typography) */}
         {/* ========================================================================= */}
         <motion.div
-          style={{ opacity: car1Opacity, x: car1X }}
+          style={{ opacity: car1Opacity, x: car1X, scale: car1Scale }}
           className="absolute inset-0 z-20 max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pointer-events-none"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pointer-events-auto">
             {/* Left Column: Creative Big Sideways Headline */}
             <div className="lg:col-span-8 flex flex-col items-start text-left">
               {/* Category Pill */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-graphite-900/80 backdrop-blur-2xl border border-white/15 mb-6 shadow-2xl">
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.1 }}
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-graphite-900/80 backdrop-blur-2xl border border-white/15 mb-6 shadow-2xl"
+              >
                 <Sparkles className="w-3.5 h-3.5 text-champagne-400" />
                 <span className="text-[11px] font-mono tracking-[0.25em] text-champagne-300 uppercase">
-                  Miami Studio • 01 Porsche 911 GT3 RS
+                  Miami Atelier • 01 Porsche 911 GT3 RS
                 </span>
-              </div>
+              </motion.div>
 
               {/* Creative Big Typography */}
-              <h1 className="font-cinzel text-5xl sm:text-7xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tight text-white uppercase leading-[0.9] text-glow">
-                <span className="block text-white font-extrabold">The Art</span>
+              <motion.h1
+                initial={{ opacity: 0, y: 25 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, delay: 0.2 }}
+                className="font-cinzel text-5xl sm:text-7xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tight text-white uppercase leading-[0.9] text-glow"
+              >
+                <span className="block text-white font-extrabold tracking-tight">The Art</span>
                 <span className="block text-metallic-gold font-light tracking-tighter">
                   Of The Finish.
                 </span>
-              </h1>
+              </motion.h1>
 
               {/* Subtitle */}
-              <p className="mt-6 text-base sm:text-xl text-titanium-300 font-light tracking-wide max-w-xl leading-relaxed">
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.35 }}
+                className="mt-6 text-base sm:text-xl text-titanium-300 font-light tracking-wide max-w-xl leading-relaxed"
+              >
                 {CARS[0].tagline} Ultrasonic clear coat depth calibration for Paint-to-Sample collectors.
-              </p>
+              </motion.p>
 
               {/* Action Buttons */}
-              <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto"
+              >
                 <Link
                   href="/book"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-white via-titanium-100 to-champagne-300 text-graphite-950 font-medium text-xs tracking-[0.2em] uppercase hover:shadow-[0_0_35px_rgba(212,175,55,0.45)] transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group"
+                  className="btn-luminous-gold w-full sm:w-auto px-8 py-4 rounded-full font-medium text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 group"
                 >
                   <span>{CARS[0].ctaText}</span>
                   <ArrowUpRight className="w-4 h-4 text-graphite-950 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -321,12 +382,17 @@ export default function HeroScrollSequence() {
                 >
                   <span>Inspect Protocol</span>
                 </Link>
-              </div>
+              </motion.div>
             </div>
 
             {/* Right Column: Floating Telemetry HUD */}
             <div className="lg:col-span-4 hidden lg:flex flex-col gap-4">
-              <div className="glass-panel p-6 rounded-3xl border border-white/15 backdrop-blur-3xl shadow-2xl flex flex-col gap-4">
+              <motion.div
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="glass-panel p-6 rounded-3xl border border-white/15 backdrop-blur-3xl shadow-2xl flex flex-col gap-4"
+              >
                 <div className="flex items-center justify-between border-b border-white/10 pb-3">
                   <span className="text-[10px] font-mono tracking-widest text-champagne-400 uppercase">
                     Stage 01 Telemetry
@@ -348,7 +414,7 @@ export default function HeroScrollSequence() {
                 <p className="text-xs text-titanium-400 font-light pt-2 border-t border-white/10">
                   Rupes Bigfoot dual-action jeweling compound removing 98% of swirl micro-marring.
                 </p>
-              </div>
+              </motion.div>
             </div>
           </div>
         </motion.div>
@@ -357,7 +423,7 @@ export default function HeroScrollSequence() {
         {/* CAR 2: FERRARI SF90 STRADALE (Right-Anchored Sideways Creative Headline) */}
         {/* ========================================================================= */}
         <motion.div
-          style={{ opacity: car2Opacity, x: car2X }}
+          style={{ opacity: car2Opacity, x: car2X, scale: car2Scale }}
           className="absolute inset-0 z-20 max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pointer-events-none"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pointer-events-auto">
@@ -393,12 +459,12 @@ export default function HeroScrollSequence() {
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-graphite-900/80 backdrop-blur-2xl border border-white/15 mb-6 shadow-2xl">
                 <Shield className="w-3.5 h-3.5 text-champagne-400" />
                 <span className="text-[11px] font-mono tracking-[0.25em] text-champagne-300 uppercase">
-                  Miami Studio • 02 Ferrari SF90 Stradale
+                  Miami Atelier • 02 Ferrari SF90 Stradale
                 </span>
               </div>
 
               <h2 className="font-cinzel text-5xl sm:text-7xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tight text-white uppercase leading-[0.9] text-glow">
-                <span className="block text-white font-light">Not Just Clean.</span>
+                <span className="block text-white font-light tracking-tight">Not Just Clean.</span>
                 <span className="block text-metallic-gold font-extrabold">Redefined.</span>
               </h2>
 
@@ -409,7 +475,7 @@ export default function HeroScrollSequence() {
               <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                 <Link
                   href="/services#ceramic-coating"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-white via-titanium-100 to-champagne-300 text-graphite-950 font-medium text-xs tracking-[0.2em] uppercase hover:shadow-[0_0_35px_rgba(212,175,55,0.45)] transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group"
+                  className="btn-luminous-gold w-full sm:w-auto px-8 py-4 rounded-full font-medium text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 group"
                 >
                   <span>{CARS[1].ctaText}</span>
                   <ArrowUpRight className="w-4 h-4 text-graphite-950 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -430,7 +496,7 @@ export default function HeroScrollSequence() {
         {/* CAR 3: BESPOKE ATELIER (Left-Anchored Sideways Headline) */}
         {/* ========================================================================= */}
         <motion.div
-          style={{ opacity: car3Opacity, x: car3X }}
+          style={{ opacity: car3Opacity, x: car3X, scale: car3Scale }}
           className="absolute inset-0 z-20 max-w-7xl mx-auto px-6 md:px-12 flex flex-col justify-center pointer-events-none"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center pointer-events-auto">
@@ -439,12 +505,12 @@ export default function HeroScrollSequence() {
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-graphite-900/80 backdrop-blur-2xl border border-white/15 mb-6 shadow-2xl">
                 <Award className="w-3.5 h-3.5 text-champagne-400" />
                 <span className="text-[11px] font-mono tracking-[0.25em] text-champagne-300 uppercase">
-                  Miami Studio • 03 Bespoke Atelier
+                  Miami Atelier • 03 Bespoke Atelier
                 </span>
               </div>
 
               <h2 className="font-cinzel text-5xl sm:text-7xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tight text-white uppercase leading-[0.9] text-glow">
-                <span className="block text-white font-extrabold">Precision</span>
+                <span className="block text-white font-extrabold tracking-tight">Precision</span>
                 <span className="block text-metallic-gold font-light tracking-tighter">
                   At Every Surface.
                 </span>
@@ -457,7 +523,7 @@ export default function HeroScrollSequence() {
               <div className="mt-8 flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                 <Link
                   href="/book"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-white via-titanium-100 to-champagne-300 text-graphite-950 font-medium text-xs tracking-[0.2em] uppercase hover:shadow-[0_0_35px_rgba(212,175,55,0.45)] transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 group"
+                  className="btn-luminous-gold w-full sm:w-auto px-8 py-4 rounded-full font-medium text-xs tracking-[0.2em] uppercase flex items-center justify-center gap-2 group"
                 >
                   <span>{CARS[2].ctaText}</span>
                   <ArrowUpRight className="w-4 h-4 text-graphite-950 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -505,31 +571,38 @@ export default function HeroScrollSequence() {
         {/* SIDEWAYS VERTICAL ACCENT STRIP (Left Edge) */}
         {/* ========================================================================= */}
         <div className="absolute left-6 top-1/2 -translate-y-1/2 hidden xl:flex flex-col items-center gap-6 z-30 pointer-events-none">
-          <div className="h-16 w-[1px] bg-gradient-to-b from-transparent via-champagne-400/50 to-transparent" />
-          <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-titanium-400 [writing-mode:vertical-rl] rotate-180">
+          <div className="h-16 w-[1px] bg-gradient-to-b from-transparent via-champagne-400/60 to-transparent" />
+          <span className="text-[10px] font-mono tracking-[0.3em] uppercase text-titanium-300 [writing-mode:vertical-rl] rotate-180">
             {CARS[activeCarIndex].verticalTag}
           </span>
-          <div className="h-16 w-[1px] bg-gradient-to-b from-transparent via-champagne-400/50 to-transparent" />
+          <div className="h-16 w-[1px] bg-gradient-to-b from-transparent via-champagne-400/60 to-transparent" />
         </div>
 
         {/* ========================================================================= */}
-        {/* BOTTOM CAR SELECTOR PILLS & SCROLL INDICATOR */}
+        {/* BOTTOM CAR SELECTOR PILLS & SCROLL PROGRESS BAR */}
         {/* ========================================================================= */}
         <div className="absolute bottom-8 left-6 right-6 max-w-7xl mx-auto flex items-center justify-between z-30 pointer-events-auto">
           {/* 3 Cars Switcher */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 p-1 rounded-full bg-graphite-950/70 backdrop-blur-2xl border border-white/10">
             {CARS.map((car, idx) => (
               <button
                 key={car.id}
                 onClick={() => scrollToCar(idx)}
-                className={`px-3.5 py-1.5 rounded-full text-[11px] font-mono tracking-wider transition-all flex items-center gap-2 ${
+                className={`relative px-4 py-2 rounded-full text-[11px] font-mono tracking-wider transition-all duration-300 flex items-center gap-2 ${
                   activeCarIndex === idx
-                    ? 'bg-white text-graphite-950 font-bold shadow-[0_0_20px_rgba(255,255,255,0.3)]'
-                    : 'bg-black/60 backdrop-blur-md text-titanium-400 hover:text-white border border-white/10'
+                    ? 'text-graphite-950 font-semibold'
+                    : 'text-titanium-400 hover:text-white'
                 }`}
               >
-                <span>{car.stage}</span>
-                <span className="hidden sm:inline-block">{car.title}</span>
+                {activeCarIndex === idx && (
+                  <motion.div
+                    layoutId="activeCarPill"
+                    className="absolute inset-0 bg-gradient-to-r from-white via-titanium-100 to-champagne-300 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)]"
+                    transition={{ type: 'spring', stiffness: 350, damping: 28 }}
+                  />
+                )}
+                <span className="relative z-10">{car.stage}</span>
+                <span className="relative z-10 hidden sm:inline-block">{car.title}</span>
               </button>
             ))}
           </div>
